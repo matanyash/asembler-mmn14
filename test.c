@@ -19,6 +19,7 @@ const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "i
                              "jsr", "rts", "stop"};
 const int numWords = sizeof(wordArray) / sizeof(wordArray[0]);
 
+int isWordInArray1(const char *word);
 //משתנים סטטים
 static int flagEror;
 static int flagSimble;
@@ -276,12 +277,12 @@ void binaryData(const char *line, StringTableBIN *table) {
 
 /////////////////////
 
-
+/*
 int isRegister(char *word) {
     printf("\n+++++  %c +++++\n", word[1]);
     return (word[1] == '@');
 }
-
+*/
 /*
      int i;
     for (i = 0; i < REGISTER_SIZE; i++) {
@@ -296,37 +297,11 @@ int isRegister(char *word) {
 int isNum(char *str) {
     char firstChar = str[0];
     return ((firstChar >= '0' && firstChar <= '9') || firstChar == '-' || firstChar == '+');
-    /*
-    int i = 0;
-        while (str[i] != '\0') {
-            if (str[i] < '0' || str[i] > '9') {
-                return 1; // Non-digit character found
-            }
-            i++;
-        }
-    printf("\nis num");
-    return 0; // Check that the string is not empty
-     */
 }
 
 int isLetter(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == ' ');
 }
-
-int isLabel(char *str) {
-
-    int i;
-    // Check the cleaned string for label validity
-    for (i = 0; str[i] != '\0'; i++) {
-        if (!isLetter(str[i]) || str[i] == '@') {
-            return 1; // Found a non-letter character
-        }
-    }
-    printf("\nis label");
-    return 0; // All characters are letters
-}
-
-
 
 //////
 
@@ -435,16 +410,18 @@ void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     char ooraa[5];
     char yaad[4];
     char makor[4];
-    if (isRegister(word1) == 1) {
+    printf("\n!!!!! word 1 is %s ", word1);
+    printf("\n!!!!! word 2 is %s ", word2);
+    if (isWordInArray1(word1) == 1) {
         strcpy(makor, "101");
         printf("\n is reg!!!");
     } else if ((isNum(word1) == 1))strcpy(makor, "001");
-    else if ((isLabel(word1) == 1))strcpy(makor, "011");
-    if ((isRegister(word2) == 1)) {
+    else strcpy(makor, "011");
+    if ((isWordInArray1(word2) == 1)) {
         printf("\n is reg too!!!");
         strcpy(yaad, "101");
     } else if ((isNum(word2) == 1))strcpy(yaad, "001");
-    else if ((isLabel(word2) == 1))strcpy(yaad, "011");
+    else strcpy(yaad, "011");
     if (strcmp(word1, "!") == 0)strcpy(makor, "000");
     if (strcmp(word2, "!") == 0)strcpy(yaad, "000");
     convertToBinaryString(actiun, ooraa);
@@ -452,5 +429,86 @@ void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     addStringToStringTable(table, firstLine);
     printf("first liine --- %s\n", firstLine);
     L++;
+}
 
+int isWordInArray1(const char *word) {
+    if (word[0] == '@' && word[1] == 'r') {
+        if (word[2] >= '0' && word[2] <= '7')return 1;
+        else printf("\nthe reg not exits\n");
+        flagEror = 1;
+    }
+    return 0;
+}
+
+char *registerToBinaryString2(char *reg) {
+    char *binaryString;
+    printf("----------- reg is  %s-----", reg);
+    switch (reg[2]) {
+        case '0':
+            binaryString = "00000";
+            break;
+        case '1':
+            binaryString = "00001";
+            break;
+        case '2':
+            binaryString = "00010";
+            break;
+        case '3':
+            binaryString = "00011";
+            break;
+        case '4':
+            binaryString = "00100";
+            break;
+        case '5':
+            binaryString = "00101";
+            break;
+        case '6':
+            binaryString = "00110";
+            break;
+        case '7':
+            binaryString = "00111";
+            break;
+        default:
+            // Handle invalid register
+            break;
+
+    }
+    return binaryString;
+}
+
+char *registerToBinaryString10(char *reg) {
+    char *binaryString;
+    printf("----------- reg is  %s-----", reg);
+    switch (reg[2]) {
+        case '0':
+            binaryString = "000000000000";
+            break;
+        case '1':
+            binaryString = "000000000100";
+            break;
+        case '2':
+            binaryString = "000000001000";
+            break;
+        case '3':
+            binaryString = "000000001100";
+            break;
+        case '4':
+            binaryString = "000000010000";
+            break;
+        case '5':
+            binaryString = "000000010100";
+            break;
+        case '6':
+            binaryString = "000000011000";
+            break;
+        case '7':
+            binaryString = "000000011100";
+            break;
+        default:
+            // Handle invalid register
+            break;
+
+    }
+    printf("\n ****** $s \n" , binaryString);
+    return binaryString;
 }

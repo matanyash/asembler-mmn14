@@ -1,1 +1,2 @@
-sub @r1,@r4
+bne W
+sub @r1, @r4

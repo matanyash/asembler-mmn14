@@ -1,33 +1,107 @@
 #include "test.c"
 
+#define MAX_WORDS 100
+#define MAX_WORD_LENGTH 50
+
 //פונקצית זיהוי טעיות תחביר
 int chekLineEror(char * line_copy){
     //printf("\nhere chek eror\n");
     flagEror++;
     return 0;
 }
+
 void pastTwo(const char *filename, StringTableBIN *tableBin, ParamTable *tableLabel);
 
-void binaryOctihen(const char *line ,StringTableBIN *table) {
+void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numTokens) {
+    *numTokens = 0;
+    // יצירת עותק ניתן לשינוי של המחרוזת המקורית
+    char inputCopy[MAX_WORD_LENGTH];
+    strcpy(inputCopy, input);
+
+    // מרכז המחרוזת משמש נקודת התחלה של חיתוך כל מילה
+    char *wordStart = inputCopy;
+
+    // עבור כל תו במחרוזת
+    for (int i = 0; inputCopy[i] != '\0'; i++) {
+        if (inputCopy[i] == ',' || isspace(inputCopy[i])) {
+            inputCopy[i] = '\0'; // החלף תו המפריד בתו סיום מחרוזת
+
+            // אם אינו מילה ריקה, הוסף אותה למערך המילים
+            if (wordStart != &inputCopy[i]) {
+                strncpy(tokens[*numTokens], wordStart, MAX_WORD_LENGTH);
+                tokens[*numTokens][MAX_WORD_LENGTH - 1] = '\0'; // ודא תמיד סיום מחרוזת
+                (*numTokens)++;
+            }
+
+            // הזז את מצב התחלה של המילה לאחר תו המפריד
+            wordStart = &inputCopy[i + 1];
+        }
+    }
+
+    // בדוק אם יש מילה שנותרה בסיום השורה
+    if (wordStart != &inputCopy[strlen(inputCopy)]&&wordStart[0] != '\0') {
+        strncpy(tokens[*numTokens], wordStart, MAX_WORD_LENGTH);
+        tokens[*numTokens][MAX_WORD_LENGTH - 1] = '\0'; // ודא תמיד סיום מחרוזת
+        (*numTokens)++;
+    }
+}
+
+void binaryOctihen(char *line ,StringTableBIN *table) {
     //printf("\n i up the table");
-    char extractedWords[2][10];
+    char extractedWords[2][50];
     char lineCopy[100];
     strcpy(lineCopy, line);
     int actiun = isWordInArray(line);
-    //char extractedWords[2][20];
-    char *position = NULL;
-    char firstLine[13];
     char twoLine[13];
+    char regBinString[13];
     char A[3] = "00";
     char B[3] = "01";
     char C[3] = "10";
     char *numBinaryString;
-    char ooraa[5];
-    char yaad[4] = "000";
-    char makor[4] = "000";
-    char *regBinString;
+    char tokens[MAX_WORDS][MAX_WORD_LENGTH];
+    int numTokens;
+    int count;
+    int i;
+    tokenizeString(line, tokens, &numTokens);
+    for (i = 0; i < numTokens; i++) {
+        printf("%s ", tokens[i]);
+        //if(strcmp(tokens[i],"This")==0)break;
+    }
+    count = numTokens -1;
+    if ((strcmp(tokens[numTokens-1], "rts") == 0)){
+        //printf("\n this is rts - -\n");
+        addStringToStringTable(table,"000111000000");
+        L++;
+    }
 
+    if(strcmp(tokens[numTokens-1], "stop") == 0){
+        //printf("\n this is stop - -\n");
+        addStringToStringTable(table, "000111100000");
+        L++;
+        return;
+    }
+    //printf("\n^^ %d ^^^^ %d", numTokens,count);
+    //printf("\n ^^^ %s", tokens[0]);
+    if (isSimbele(tokens[0])==1) {
+        count--;
+        //printf("\n is simbele! \n");
+    }
+    if (count == 1) {
+        strcpy(extractedWords[0], "!");
+        strcpy(extractedWords[1], tokens[numTokens - 1]);
+    }
+    if (count == 2) {
+        strcpy(extractedWords[0], tokens[numTokens - 2]);
+        strcpy(extractedWords[1], tokens[numTokens - 1]);
+    }
+
+    if ((isWordInArray1(extractedWords[0]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[0]));
+    if ((isWordInArray1(extractedWords[1]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[1]));
+    //printf("\n ^^^^^ %s\n",regBinString);
+    //printf("\n******** %s *********\n",extractedWords[0]);
+    //printf("\n******** %s *********\n",extractedWords[1]);
     // Find the first occurrence of any word from wordArray
+    /*
     for (int i = 0; i < numWords; i++) {
         position = strstr(lineCopy, wordArray[i]);
         if (position != NULL) {
@@ -62,19 +136,61 @@ void binaryOctihen(const char *line ,StringTableBIN *table) {
         printf("First word: %s\n", extractedWords[0]);
         printf("Second word: %s\n", extractedWords[1]);
 
+*/
 
-    }
-    printf("%c",extractedWords[0][0]);
+    //printf("%c",extractedWords[0][0]);
     //קידוד שורה ראשונה
-    binaryFirstLine(extractedWords[0],extractedWords[1],actiun, table);
+    //printf("\n!!!!! word 1 is %s ", tokens[numTokens - 2]);
+    //printf("\n!!!!! word 2 is %s ", tokens[numTokens - 3]);
+    //printf("\n!!!!! word 1 is %s ", extractedWords[0]);
+    //printf("\n!!!!! word 2 is %s ", extractedWords[1]);
+    binaryFirstLine(extractedWords[0], extractedWords[1], actiun, table);
     numBinaryString = numberToBinaryString(extractedWords[0]);
-    regBinString = registerToBinaryString(extractedWords[0]);
 
     switch (actiun) {
         case 0:
-            //printf("Performing action for value 0\n");
-            //L = L+3; //test
-            break;
+            //printf("\nPerforming action for value 0\n");
+            if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
+                strcpy(twoLine, registerToBinaryString2(extractedWords[0]));
+                strcat(twoLine, registerToBinaryString2(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                //printf("\ntwo liine --- %s\n", twoLine);
+                break;
+            }
+            if(isWordInArray1(extractedWords[0])){
+                addStringToStringTable(table, regBinString);
+                L++;
+                //printf("\ntwo liine --- %s\n", regBinString);
+            }
+
+            else if(isNum(extractedWords[0])){
+                strcpy(twoLine, numberToBinaryString(extractedWords[0]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                //printf("\ntwo liine --- %s\n", twoLine);
+            } else addStringToStringTable(table, extractedWords[0]);
+
+            if (isWordInArray1(extractedWords[1])){
+                addStringToStringTable(table, regBinString);
+                L++;
+                //printf("\nthree liine --- %s\n", regBinString);
+                break;
+            }
+            else if(isNum(extractedWords[1])){
+                strcpy(twoLine, numberToBinaryString(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                //printf("\nthree liine --- %s\n", twoLine);
+                break;
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+                L++;
+                //printf("\nthree liine --- %s\n", extractedWords[1]);
+                break;
         case 1:
             //printf("Performing action for value 1\n");;
             break;
@@ -83,139 +199,135 @@ void binaryOctihen(const char *line ,StringTableBIN *table) {
             break;
         case 3:
             //printf("Performing action for value 3\n");
+            if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
+                strcpy(twoLine, registerToBinaryString2(extractedWords[0]));
+                strcat(twoLine, registerToBinaryString2(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                //printf("two liine --- %s\n", twoLine);
+                break;
+            }
             break;
         case 4:
-            printf("Performing action for value 4\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 5:
-            printf("Performing action for value 5\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 6:
-            printf("Performing action for value 6\n");
-            if (isRegister(extractedWords[1])){
-                addStringToStringTable(table,"000110001100");
-            }else
-                addStringToStringTable(table,"000110010100");
-            L = L+2;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 7: // not work
-            printf("Performing action for value 7\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 8:
-            printf("Performing action for value 8\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 9:
-            printf("Performing action for value 9\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 10:
-            printf("Performing action for value 10\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 11:
-            printf("Performing action for value 11\n");
-            if (isRegister(extractedWords[1])){
-                strcpy(twoLine, regBinString);
-                strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
-            break;
-        case 12://prn
-            printf("Performing action for value 12\n");
-            if (isRegister(extractedWords[1])) {
+            //printf("Performing action for value 4\n");
+            if (isWordInArray1(extractedWords[1])) {
                 strcpy(twoLine, regBinString);
                 strcat(twoLine, A);
                 addStringToStringTable(table, twoLine);
-            }
-            else if (isNum(extractedWords[1]) == 0) {
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 5:
+            //printf("Performing action for value 5\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 6: // not work
+            //printf("Performing action for value 6\n");
+            if (isWordInArray1(extractedWords[1])) {
+                addStringToStringTable(table, "000110001100");
+            } else
+                addStringToStringTable(table, "000110010100");
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 7:
+            //printf("Performing action for value 7\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 8:
+            //printf("Performing action for value 8\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 9:
+            //printf("Performing action for value 9\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 10:
+            //printf("Performing action for value 10\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 11:
+            //printf("Performing action for value 11\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
+        case 12://prn
+            //printf("Performing action for value 12\n");
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else if (isNum(extractedWords[1]) == 1) {
                 strcpy(twoLine, numberToBinaryString(extractedWords[1]));
                 strcat(twoLine, A);
                 addStringToStringTable(table, twoLine);
 
-            }
-            else addStringToStringTable(table, extractedWords[1]);
-                L = L+1;
-            printf("two liine --- %s\n", twoLine);
-                break;
+            } else addStringToStringTable(table, extractedWords[1]);
+            L++;
+            //printf("two liine --- %s\n", twoLine);
+            break;
         case 13:
-            printf("Performing action for value 13\n");
-            if (isRegister(extractedWords[1])){
+            //printf("Performing action for value 13\n");
+            if (isWordInArray1(extractedWords[1])) {
                 strcpy(twoLine, regBinString);
                 strcat(twoLine, A);
-                addStringToStringTable(table,twoLine);
-            }else
-                addStringToStringTable(table,extractedWords[1]);
-            L = L+1;
-            printf("two liine --- %s\n", twoLine);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L ++;
+            //printf("two liine --- %s\n", twoLine);
             break;
-        /*
-         case 14:
-            addStringToStringTable(table,"000111000000");
-            L++;
-            break;
-        case 15:
-            addStringToStringTable(table,"000111100000");
-            L++;
-            break;
-        */
         default:
-            printf("Invalid value\n");
             break;
     }
     //free(numBinaryString);
     //free(position);
-}
 
+}
 /////////////////
 void processFile(const char *filename) {
     StringTableBIN tableBIN;
@@ -239,7 +351,7 @@ void processFile(const char *filename) {
         if(chekLineEror(line_copy))continue;
         //זמני
         lineCount++;
-        printf("line %d is = %s", lineCount, line);
+        //printf("line %d is = %s", lineCount, line);
         //
 
         word = strtok(line, " "); // מפצל את השורה למילים
@@ -350,4 +462,3 @@ processFile(filename);
 
 return 0;
 }
-
