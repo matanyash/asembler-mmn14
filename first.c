@@ -6,11 +6,11 @@
 //פונקצית זיהוי טעיות תחביר
 int chekLineEror(char * line_copy){
     //printf("\nhere chek eror\n");
-    flagEror++;
+    //flagEror++;
     return 0;
 }
 
-void pastTwo(const char *filename, StringTableBIN *tableBin, ParamTable *tableLabel);
+void pastTwo(const char *filename, StringTableBIN *tableBin, ParamTable **tableLabel);
 
 void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numTokens) {
     *numTokens = 0;
@@ -97,53 +97,7 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
 
     if ((isWordInArray1(extractedWords[0]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[0]));
     if ((isWordInArray1(extractedWords[1]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[1]));
-    //printf("\n ^^^^^ %s\n",regBinString);
-    //printf("\n******** %s *********\n",extractedWords[0]);
-    //printf("\n******** %s *********\n",extractedWords[1]);
-    // Find the first occurrence of any word from wordArray
-    /*
-    for (int i = 0; i < numWords; i++) {
-        position = strstr(lineCopy, wordArray[i]);
-        if (position != NULL) {
-            break;
-        }
-    }
 
-    if (position != NULL){
-        //printf("+++%s", position);
-        position += strlen(wordArray[0]); // Move past the found word
-        char *token = strtok(position, ",");
-        int count = 0;
-        printf("+++%s", token);
-
-
-        while (token != NULL && count < 2) {
-
-            // Store the extracted word in the array
-            strcpy(extractedWords[count], token);
-            count++;
-
-            token = strtok(NULL, ",");
-        }
-        // If only one word was found, set the second slot to -1
-        if (count == 1) {
-            char temp[50];  // Create a temporary buffer to hold word1
-            strcpy(temp, extractedWords[0]);
-            strcpy(extractedWords[0], "!");
-            strcpy(extractedWords[1], temp);
-        }
-        // Print the extracted words
-        printf("First word: %s\n", extractedWords[0]);
-        printf("Second word: %s\n", extractedWords[1]);
-
-*/
-
-    //printf("%c",extractedWords[0][0]);
-    //קידוד שורה ראשונה
-    //printf("\n!!!!! word 1 is %s ", tokens[numTokens - 2]);
-    //printf("\n!!!!! word 2 is %s ", tokens[numTokens - 3]);
-    //printf("\n!!!!! word 1 is %s ", extractedWords[0]);
-    //printf("\n!!!!! word 2 is %s ", extractedWords[1]);
     binaryFirstLine(extractedWords[0], extractedWords[1], actiun, table);
     numBinaryString = numberToBinaryString(extractedWords[0]);
 
@@ -160,6 +114,8 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
                 break;
             }
             if(isWordInArray1(extractedWords[0])){
+                strcpy(regBinString, registerToBinaryString2(extractedWords[0]));
+                strcat(regBinString, "0000000");
                 addStringToStringTable(table, regBinString);
                 L++;
                 //printf("\ntwo liine --- %s\n", regBinString);
@@ -176,7 +132,6 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
             if (isWordInArray1(extractedWords[1])){
                 addStringToStringTable(table, regBinString);
                 L++;
-                //printf("\nthree liine --- %s\n", regBinString);
                 break;
             }
             else if(isNum(extractedWords[1])){
@@ -184,33 +139,31 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
                 strcat(twoLine, A);
                 addStringToStringTable(table, twoLine);
                 L++;
-                //printf("\nthree liine --- %s\n", twoLine);
                 break;
             } else
                 addStringToStringTable(table, extractedWords[1]);
                 L++;
-                //printf("\nthree liine --- %s\n", extractedWords[1]);
                 break;
         case 1:
-            //printf("Performing action for value 1\n");;
+
             break;
         case 2:
-            //printf("Performing action for value 2\n");
+
             break;
         case 3:
-            //printf("Performing action for value 3\n");
+
             if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
                 strcpy(twoLine, registerToBinaryString2(extractedWords[0]));
                 strcat(twoLine, registerToBinaryString2(extractedWords[1]));
                 strcat(twoLine, A);
                 addStringToStringTable(table, twoLine);
                 L++;
-                //printf("two liine --- %s\n", twoLine);
+
                 break;
             }
             break;
         case 4:
-            //printf("Performing action for value 4\n");
+
             if (isWordInArray1(extractedWords[1])) {
                 strcpy(twoLine, regBinString);
                 strcat(twoLine, A);
@@ -218,10 +171,10 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
             } else
                 addStringToStringTable(table, extractedWords[1]);
             L++;
-            //printf("two liine --- %s\n", twoLine);
+
             break;
         case 5:
-            //printf("Performing action for value 5\n");
+
             if (isWordInArray1(extractedWords[1])) {
                 strcpy(twoLine, regBinString);
                 strcat(twoLine, A);
@@ -229,19 +182,15 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
             } else
                 addStringToStringTable(table, extractedWords[1]);
             L++;
-            //printf("two liine --- %s\n", twoLine);
             break;
         case 6: // not work
-            //printf("Performing action for value 6\n");
             if (isWordInArray1(extractedWords[1])) {
                 addStringToStringTable(table, "000110001100");
             } else
                 addStringToStringTable(table, "000110010100");
             L++;
-            //printf("two liine --- %s\n", twoLine);
             break;
         case 7:
-            //printf("Performing action for value 7\n");
             if (isWordInArray1(extractedWords[1])) {
                 strcpy(twoLine, regBinString);
                 strcat(twoLine, A);
@@ -338,6 +287,8 @@ void processFile(const char *filename) {
     char line_copy[memoryData];
     char *word;
     char word2[100];
+    char tokens[MAX_WORDS][MAX_WORD_LENGTH];
+    int numTokens;
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         perror("Error opening file");
@@ -353,65 +304,67 @@ void processFile(const char *filename) {
         lineCount++;
         //printf("line %d is = %s", lineCount, line);
         //
-
-        word = strtok(line, " "); // מפצל את השורה למילים
-        while (word != NULL) {
-            strcpy(word2, word);
-            if (isSimbele(word))flagSimble = 1; //3,4
-            if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy)){ //5
-                    word = strtok(NULL, " ");
-                    if (isStringKeyword(word) || isDataKeyword(word)) {
-                        if (flagSimble == 1){
-                            upTabelLabel(word2, DC, "data");
-                            flagSimble=0;
-                        }
-                        if(containsDataKeyword(line_copy))binaryData(line_copy,&tableBIN); //7
-                        else binaryString(line_copy,&tableBIN);
-                        break;
-                    }
-            }
-            else if (containsExternKeyword(line_copy) || containsEntryKeyword(line_copy)) {
-                    word = strtok(NULL, " ");
-                    if (isExternKeyword(word2)) {
-                        upTabelLabel(word, -1, "extrnal"); //9
-                        flagSimble=0;
-                        break;
-                    }
-            }
-            else {
-                    //word = strtok(NULL, " ");
-                    if (flagSimble) {
-                        upTabelLabel(word2, IC, "code");//11
-                        flagSimble=0;
-                    }
-                    if (isWordInArray(line_copy) == -1) { //12
-                        printf("\nEror! the actiun not exist");
-                        flagEror = 1;
-                        break;
-                    }
-                    binaryOctihen(line_copy,&tableBIN);//13
-                    IC = IC + L;
-                    break;
+        tokenizeString(line_copy, tokens, &numTokens);
+        if (isSimbele(tokens[0]))flagSimble = 1; //3,4
+        if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy)){ //5
+            if (isStringKeyword(tokens[1]) || isDataKeyword(tokens[1])) {
+                if (flagSimble == 1){
+                    upTabelLabel(tokens[0], DC, "data");
+                    flagSimble=0;
                 }
-            word = strtok(NULL, " ");
-        }
+                if(containsDataKeyword(line_copy)){
 
+                    binaryData(line_copy,&tableBIN); //7
+                    continue;
+                }
+                else {
+                    binaryString(line_copy,&tableBIN);
+                    continue;
+                }
+
+            }
+        }
+        else if (containsExternKeyword(line_copy) || containsEntryKeyword(line_copy)) {
+            if (isExternKeyword(tokens[0])) {
+                upTabelLabel(tokens[1], -1, "extrnal"); //9
+                flagSimble=0;
+                continue;
+            }
+        }
+        else {
+            if (flagSimble) {
+                upTabelLabel(tokens[0], IC, "code");//11
+                flagSimble=0;
+            }
+            if (isWordInArray(line_copy) == -1) { //12
+                printf("\nEror! the actiun not exist");
+                flagEror = 1;
+                continue;
+            }
+            binaryOctihen(line_copy,&tableBIN);//13
+            IC = IC + L;
+            continue;
+        }
     }
     printStringTable(&tableBIN);
     //printParamTable(&tableLabel);
-    fclose(file);
-    //if (flagEror)exit(1);//16
     duplicateDataWithType(IC);//17
     printParamTable(&tableLabel);
-    pastTwo(filename,&tableBIN,&tableLabel);
+    pastTwo(filename, &tableBIN, &tableLabel);
+    fclose(file);
+    if(flagEror)exit(1);//16
+    process_input_file(&tableBIN,"x.ob");
+    process_input_file_ent("ps.ent");
+    process_input_file_ext("ps.ext", &tableBIN);
+
 }
 
-void pastTwo(const char *filename, StringTableBIN *tableBin1, ParamTable *tableLabel1 ){
-    int lineCount = 0;
+void pastTwo(const char *filename, StringTableBIN *tableBin1, ParamTable ** tableLabel1 ) {
     char line[memoryData];
     char line_copy[memoryData];
-    char *word;
-    char word2[100];
+    char tokens[MAX_WORDS][MAX_WORD_LENGTH];
+    int numTokens;
+
     IC = 0;
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -423,36 +376,26 @@ void pastTwo(const char *filename, StringTableBIN *tableBin1, ParamTable *tableL
     while (fgets(line, sizeof(line), file) != NULL) {
         L = 0;
         strcpy(line_copy, line);
-        if(chekLineEror(line_copy))continue;
-        //זמני
-        lineCount++;
-        printf("line %d is = %s", lineCount, line);
-        //
-
-        word = strtok(line, " "); // מפצל את השורה למילים
-        while (word != NULL) {
-            strcpy(word2, word);
-            if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy) || containsExternKeyword(line_copy)) //4
-                break;
-            if (containsEntryKeyword(line_copy)) { //5
-                word = strtok(NULL, " ");
-                printf("\n ********%s********\n", word);
-                if (checkIfWordExists(tableLabel1,word)==0){
-                    printf("\n Eror! the label not entry\n");
-                    break;
-                }
-            }else{
-                printf("");
+        if (chekLineEror(line_copy))continue;
+        tokenizeString(line_copy, tokens, &numTokens);
+        if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy) || containsExternKeyword(line_copy)) //4
+            continue;
+        if (containsEntryKeyword(line_copy)) {
+            //5
+            if (checkIfWordExists(tableLabel1, tokens[1]) == 0) {
+                printf("\n Eror! the label not entry\n");
+                flagEror = 1;
+                continue;
             }
-                IC = IC + L;
-                break;
-            }
-            word = strtok(NULL, " ");
         }
-
+        IC = IC + L;
+        //replaceStringInTable(tableBin1, tableLabel1);
     }
-
-
+    updateTables(tableBin1);
+    //replaceStringInTable(tableBin1, tableLabel1);
+    printParamTable(tableLabel1);
+    printStringTable(tableBin1);
+}
 
 
 

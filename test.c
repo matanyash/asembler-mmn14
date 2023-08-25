@@ -4,22 +4,11 @@
 #include <ctype.h>
 #include "LabelTabel.c"
 
-#define DATA ".data"
-#define STRING ".string"
-#define ENTRY ".entry"
-#define EXTERNAL ".extern"
 #define memoryData 1024
 #define MAX_STRING_LENGTH 100
 #define MAX_TABLE_SIZE 1024
 #define REGISTER_SIZE 8
 
-
-const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
-const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
-                             "jsr", "rts", "stop"};
-const int numWords = sizeof(wordArray) / sizeof(wordArray[0]);
-
-int isWordInArray1(const char *word);
 //משתנים סטטים
 static int flagEror;
 static int flagSimble;
@@ -27,9 +16,17 @@ static int L = 0;
 static int DC = 0;
 static int IC = 100;
 
-//////////////////טבלת קידוד
+const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
+const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
+                             "jsr", "rts", "stop"};
+const int numWords = sizeof(wordArray) / sizeof(wordArray[0]);
+void intToBinaryString10(int num, char *binaryStr);
+int isWordInArray1(const char *word);
+
+
 typedef struct {
     char strings[MAX_TABLE_SIZE][MAX_STRING_LENGTH];
+    char ent[10][10];
     int nextIndex;
 } StringTableBIN;
 
@@ -49,14 +46,67 @@ int addStringToStringTable(StringTableBIN *table, const char *str) {
     table->nextIndex++;
     return table->nextIndex - 1; // Index of the added string
 }
-
-void updateStringInTable(StringTableBIN *table, int index, const char *newStr) {
-    if (index >= 0 && index < table->nextIndex) {
-        strncpy(table->strings[index], newStr, MAX_STRING_LENGTH - 1);
-        table->strings[index][MAX_STRING_LENGTH - 1] = '\0'; // Ensure null-terminated
+int addEntToStringTable(StringTableBIN *table, const char *str) {
+    if (table->nextIndex >= MAX_TABLE_SIZE) {
+        return -1; // Table is full
     }
+
+    strncpy(table->ent[table->nextIndex], str, MAX_STRING_LENGTH - 1);
+    table->ent[table->nextIndex][MAX_STRING_LENGTH - 1] = '\0'; // Ensure null-terminated
+
+    table->nextIndex++;
+    return table->nextIndex - 1; // Index of the added string
 }
 
+
+void updateTables(StringTableBIN *table1) {
+    int size1 = table1->nextIndex;
+    printf("\nsize1 =  %d \n",size1);
+    int type;
+    char newBin[13];
+    char R[3] = "01";
+    char E[3] = "10";
+    int i, j;
+
+    for (i = 0; i < size1; i++) {
+        for (j = 0; j < 10; j++) {
+            //printf("\n i is = %d , j is %d \n",i,j);
+            //printf("\n table1 is %s \n",table1->strings[i]);
+            if (tableLabel[j].nextIndex == -1) continue;
+            //printf("\nlabal = %s    \n", (tableLabel[j].Type));
+            if (strcmp(table1->strings[i], tableLabel[j].Label) == 0)
+            {
+                if (strcmp(tableLabel[j].Type, "entry") == 0){
+                    type = tableLabel[j].ID;
+                    intToBinaryString10(type, newBin);
+                    strcat(newBin,E);
+                    printf(" \n   is entry \n");
+                    strcpy( table1->strings[i], newBin);
+                    continue;
+            }
+                else if (strcmp(tableLabel[j].Type, "extrnal") == 0) {
+                //Update string value with the ID from table2
+                    type = tableLabel[j].ID;
+                    strcpy(newBin , "000000000001");
+                    strcpy(table1->strings[i], newBin);
+                    strcpy(table1->ent[i], tableLabel[j].Label);
+                    //printf("\na   %s    \n",table1->strings[i]);
+                    continue;
+                }
+                type = tableLabel[j].ID;
+                intToBinaryString10(type, newBin);
+                strcat(newBin,E);
+                printf(" \n   is entry \n");
+                strcpy( table1->strings[i], newBin);
+                continue;
+            //else strcpy((char *) table1[i].strings, "2222222222");
+            }
+            //if (tableLabel[j].nextIndex == -1) break;
+        }
+        //printf("\n --  i is %d ----\n",i);
+    }
+    printf("\n --   good ----\n");
+}
 void printStringTable(const StringTableBIN *table) {
     for (int i = 0; i < table->nextIndex; i++) {
         printf("\nString %d: %s\n", i, table->strings[i]);
@@ -511,4 +561,118 @@ char *registerToBinaryString10(char *reg) {
     }
     printf("\n ****** $s \n" , binaryString);
     return binaryString;
+}
+
+void intToBinaryString10(int num, char *binaryStr) {
+    if (num < 0) {
+        sprintf(binaryStr, "Negative numbers are not supported.");
+        return;
+    }
+
+    if (num == 0) {
+        sprintf(binaryStr, "0000000000");
+        return;
+    }
+
+    int i = 9; // We start from the last character and move to the first
+    while (num > 0 && i >= 0) {
+        binaryStr[i] = (num % 2) + '0'; // Get the least significant bit
+        num /= 2;
+        i--;
+    }
+
+    // Fill the remaining characters with leading zeros
+    while (i >= 0) {
+        binaryStr[i] = '0';
+        i--;
+    }
+
+    binaryStr[10] = '\0'; // Null-terminate the string
+}
+
+
+void base64_encode(const char* input, char* output) {
+    const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const int input_length = strlen(input);
+    int output_length = 0;
+
+    for (int i = 0; i < input_length; i += 6) {
+        unsigned int value = 0;
+        for (int j = 0; j < 6 && i + j < input_length; j++) {
+            value = (value << 1) | (input[i + j] - '0');
+        }
+        output[output_length++] = base64_table[value];
+    }
+
+    output[output_length] = '\0';
+}
+
+// הפונקציה process_input_file מקבלת שני שמות של קבצים - קובץ קלט וקובץ פלט.
+// הפונקציה פותחת את שני הקבצים, ולאחר מכן עוברת על התוכן של קובץ הקלט שבו כל שורה היא מחרוזת בינארית באורך 12 תווים.
+// לכל מחרוזת בקובץ הקלט מתבצעת המרה לקוד base64 באמצעות הפונקציה base64_encode והתוצאה מודפסת לקובץ הפלט, עם תו נפרד '\n' בין שורות.
+// כאשר כל הקובץ הקלט נסרק, הפונקציה סוגרת את שני קבצי הקלט והפלט ומדפיסה הודעת הצלחה.
+void process_input_file(StringTableBIN *table, const char* output_filename) {
+    char input_string[13];
+    char output_string[9];
+    int i=0;
+    FILE* output_file = fopen(output_filename, "w");
+
+    if (output_file == NULL) {
+        printf("eror not can open the file\n");
+        return;
+    }
+;
+
+    // קריאה שורה אחת לכל פעם מהקובץ הקלט כל עוד יש מחרוזת לקרוא.
+    while (i < table->nextIndex) {
+        strcpy(input_string,table->strings[i]);
+        // מחיקת התו '\n' שמיותר בסוף המחרוזת (הכריתה של התו האחרון).
+        //[strcspn(input_string, "\n")] = '\0';
+        // המרת המחרוזת בינארית לקוד base64 והדפסתה לקובץ הפלט עם תו נפרד '\n' בסוף כל שורה.
+        base64_encode(input_string, output_string);
+        fprintf(output_file, "%s\n", output_string);
+        i++;
+    }
+
+    // סגירת קבצי הקלט והפלט.
+    fclose(output_file);
+
+    printf("all good\n");
+}
+
+void process_input_file_ent(const char* output_filename) {
+    int i = 0;
+    FILE *output_file = fopen(output_filename, "w");
+
+    if (output_file == NULL) {
+        printf("eror not can open the file\n");
+        return;
+    }
+    while (i < MAX_TABLE_SIZE) {
+        //printf("\n i is - %d\n",i);
+        if (strcmp(tableLabel[i].Type, "entry") == 0) {
+            //printf(" \n^&^& %d  ",tableLabel[i].ID);
+            fprintf(output_file, "%s %d\n",tableLabel[i].Label, tableLabel[i].ID);
+        }
+        i++;
+    }
+    fclose(output_file);
+}
+void process_input_file_ext(const char* output_filename, StringTableBIN *table) {
+    int i = 0;
+    FILE *output_file = fopen(output_filename, "w");
+
+    if (output_file == NULL) {
+        printf("eror not can open the file\n");
+        return;
+    }
+    while (i < table->nextIndex) {
+        //printf("\n i is - %d\n",i);
+        if (strcmp(table->strings[i], "000000000001") == 0) {
+            //printf(" \n^&^& %d  ",tableLabel[i].ID);
+            fprintf(output_file, "%s %d\n",table->ent[i],i+100);
+        }
+        i++;
+    }
+    fclose(output_file);
 }
