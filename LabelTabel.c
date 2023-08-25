@@ -11,7 +11,7 @@ typedef struct {
     int nextIndex;
 } ParamTable;
 
-ParamTable tableLabel[MAX_TABLE_SIZE];
+static ParamTable tableLabel[MAX_TABLE_SIZE];
 
 void initParamTable() {
     for (int i = 0; i < MAX_TABLE_SIZE; i++) {
@@ -65,7 +65,7 @@ int checkIfWordExists(ParamTable *table,char *word) {
     //printf("\ntable is %s\n",table[2].Label);
     for (int i = 0; i < MAX_TABLE_SIZE; i++) {
         if (strcmp(table[i].Label, word) == 0) {
-            printf("\n this is -table is %s\n",table[i].Label);
+            strncpy(tableLabel[i].Type, "entry", sizeof(tableLabel[i].Type));
             return 1; // Word exists in the table
         }
     }
