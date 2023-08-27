@@ -9,6 +9,9 @@
 #define MAX_TABLE_SIZE 1024
 #define REGISTER_SIZE 8
 
+#define MAX_WORDS 100
+#define MAX_WORD_LENGTH 50
+
 //משתנים סטטים
 static int flagEror;
 static int flagSimble;
@@ -30,7 +33,7 @@ typedef struct {
     int nextIndex;
 } StringTableBIN;
 
-
+void process_input_file(StringTableBIN *table, const char* output_filename);
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
 }
@@ -675,4 +678,235 @@ void process_input_file_ext(const char* output_filename, StringTableBIN *table) 
         i++;
     }
     fclose(output_file);
+}
+
+void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numTokens) {
+    *numTokens = 0;
+    int i;
+    char inputCopy[MAX_WORD_LENGTH];
+    char *wordStart = inputCopy;
+
+    strcpy(inputCopy, input);
+    for (i = 0; inputCopy[i] != '\0'; i++) {
+        if (inputCopy[i] == ',' || isspace(inputCopy[i])) {
+            inputCopy[i] = '\0';
+
+            if (wordStart != &inputCopy[i]) {
+                strncpy(tokens[*numTokens], wordStart, MAX_WORD_LENGTH);
+                tokens[*numTokens][MAX_WORD_LENGTH - 1] = '\0';
+                (*numTokens)++;
+            }
+
+            wordStart = &inputCopy[i + 1];
+        }
+    }
+
+    if (wordStart != &inputCopy[strlen(inputCopy)]&&wordStart[0] != '\0') {
+        strncpy(tokens[*numTokens], wordStart, MAX_WORD_LENGTH);
+        tokens[*numTokens][MAX_WORD_LENGTH - 1] = '\0';
+        (*numTokens)++;
+    }
+}
+
+void binaryOctihen(char *line ,StringTableBIN *table) {
+    char extractedWords[2][50];
+    char lineCopy[100];
+    int actiun = isWordInArray(line);
+    char twoLine[13];
+    char regBinString[13];
+    char A[3] = "00";
+    char B[3] = "01";
+    char C[3] = "10";
+    char *numBinaryString;
+    char tokens[MAX_WORDS][MAX_WORD_LENGTH];
+    int numTokens;
+    int count;
+    int i;
+    strcpy(lineCopy, line);
+    tokenizeString(line, tokens, &numTokens);
+
+    for (i = 0; i < numTokens; i++) {
+        printf("%s ", tokens[i]);
+    }
+    count = numTokens -1;
+    if ((strcmp(tokens[numTokens-1], "rts") == 0)){
+        addStringToStringTable(table,"000111000000");
+        L++;
+    }
+
+    if(strcmp(tokens[numTokens-1], "stop") == 0){
+        addStringToStringTable(table, "000111100000");
+        L++;
+        return;
+    }
+    if (isSimbele(tokens[0])==1) {
+        count--;
+
+    }
+    if (count == 1) {
+        strcpy(extractedWords[0], "!");
+        strcpy(extractedWords[1], tokens[numTokens - 1]);
+    }
+    if (count == 2) {
+        strcpy(extractedWords[0], tokens[numTokens - 2]);
+        strcpy(extractedWords[1], tokens[numTokens - 1]);
+    }
+
+    if ((isWordInArray1(extractedWords[0]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[0]));
+    if ((isWordInArray1(extractedWords[1]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[1]));
+
+    binaryFirstLine(extractedWords[0], extractedWords[1], actiun, table);
+    numBinaryString = numberToBinaryString(extractedWords[0]);
+
+    switch (actiun) {
+        case 0:
+            if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
+                strcpy(twoLine, registerToBinaryString2(extractedWords[0]));
+                strcat(twoLine, registerToBinaryString2(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                break;
+            }
+            if(isWordInArray1(extractedWords[0])){
+                strcpy(regBinString, registerToBinaryString2(extractedWords[0]));
+                strcat(regBinString, "0000000");
+                addStringToStringTable(table, regBinString);
+                L++;
+            }
+
+            else if(isNum(extractedWords[0])){
+                strcpy(twoLine, numberToBinaryString(extractedWords[0]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+
+            } else addStringToStringTable(table, extractedWords[0]);
+
+            if (isWordInArray1(extractedWords[1])){
+                addStringToStringTable(table, regBinString);
+                L++;
+                break;
+            }
+            else if(isNum(extractedWords[1])){
+                strcpy(twoLine, numberToBinaryString(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                break;
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 1:
+
+            break;
+        case 2:
+
+            break;
+        case 3:
+            if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
+                strcpy(twoLine, registerToBinaryString2(extractedWords[0]));
+                strcat(twoLine, registerToBinaryString2(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+                L++;
+                break;
+            }
+            break;
+        case 4:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 5:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 6:
+            if (isWordInArray1(extractedWords[1])) {
+                addStringToStringTable(table, "000110001100");
+            } else
+                addStringToStringTable(table, "000110010100");
+            L++;
+            break;
+        case 7:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 8:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 9:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 10:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 11:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 12:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else if (isNum(extractedWords[1]) == 1) {
+                strcpy(twoLine, numberToBinaryString(extractedWords[1]));
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+
+            } else addStringToStringTable(table, extractedWords[1]);
+            L++;
+            break;
+        case 13:
+            if (isWordInArray1(extractedWords[1])) {
+                strcpy(twoLine, regBinString);
+                strcat(twoLine, A);
+                addStringToStringTable(table, twoLine);
+            } else
+                addStringToStringTable(table, extractedWords[1]);
+            L ++;
+            break;
+        default:
+            break;
+    }
 }
