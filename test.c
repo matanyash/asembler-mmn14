@@ -33,7 +33,8 @@ typedef struct {
     int nextIndex;
 } StringTableBIN;
 
-void process_input_file(StringTableBIN *table, const char* output_filename);
+//void process_input_file(StringTableBIN *table, const char* output_filename);
+
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
 }
@@ -49,6 +50,7 @@ int addStringToStringTable(StringTableBIN *table, const char *str) {
     table->nextIndex++;
     return table->nextIndex - 1; // Index of the added string
 }
+
 int addEntToStringTable(StringTableBIN *table, const char *str) {
     if (table->nextIndex >= MAX_TABLE_SIZE) {
         return -1; // Table is full
@@ -116,8 +118,7 @@ void printStringTable(const StringTableBIN *table) {
     }
 }
 
-/////////////////
-//בדיקה האם הפעולה קיימת
+/*A function to check if an action exists*/
 int isWordInArray(const char *line) {
     int i;
     char lineCopy[1000];
@@ -147,52 +148,8 @@ int isWordInArray(const char *line) {
     return -1;
 }
 
-/*
-//////////////בדיקה חדשה
-int isWordInArray(const char *line) {
-        int i;
-        char currentWord[100];  // Assuming max word length is 100 characters
 
-        for (i = 0; line[i] != '\0'; i++) {
-            if (line[i] != ' ') {
-                currentWord[i] = line[i];
-            } else {
-                currentWord[i] = '\0';  // Add a null-terminator to complete the current word
-
-                for (int k = 0; k < numWords; k++) {
-                    if (strcmp(currentWord, wordArray[k]) == 0) {
-                        printf("\nFound word: %s\n", wordArray[k]);
-                        return 1;
-                    }
-                }
-                i = -1;  // Reset the index for the next word
-            }
-        }
-
-        // Check the last word (no trailing space)
-        currentWord[i] = '\0';
-        for (int k = 0; k < numWords; k++) {
-            if (strcmp(currentWord, wordArray[k]) == 0) {
-                printf("\nFound word: %s\n", wordArray[k]);
-                return 1;
-            }
-        }
-
-        if (i > 0) {  // Check if there's a non-empty last word
-            for (int k = 0; k < numWords; k++) {
-                if (strcmp(currentWord, wordArray[k]) == 0) {
-                    printf("\nFound word: %s\n", wordArray[k]);
-                    return 1;
-                }
-            }
-
-        }
-    return -1;
-    }
-    */
-///////////////////////
-//בדיקת סמל
-int isSimbele(const char *word) {
+int isSymbol(const char *word) {
     int length = strlen(word);
 
     if (length > 0 && word[length - 1] == ':') {
@@ -202,7 +159,7 @@ int isSimbele(const char *word) {
     }
 }
 
-//פונקציות בדיקת מילים
+
 int isStringKeyword(const char *word) {
     return strcmp(word, ".string") == 0;
 }
@@ -221,12 +178,12 @@ int isEntryKeyword(const char *word) {
 }
 
 
-// בודק אם המחרוזת מכילה את המילה ".string"
+/*Checks if the string contains the word ".string"*/
 int containsStringKeyword(const char *line) {
     return strstr(line, ".string") != NULL;
 }
 
-// בודק אם המחרוזת מכילה את המילה ".data"
+/*Checks if the string contains the word ".entry"*/
 int containsDataKeyword(const char *line) {
     return strstr(line, ".data") != NULL;
 }
@@ -241,19 +198,13 @@ int containsEntryKeyword(const char *line) {
     return strstr(line, ".entry") != NULL;
 }
 
-//פונקצית עדכון טבלת סמלים
+/*Symbol table update function*/
 void upTabelLabel(char *label, int counter, char *type) {
 //    printf(" this up the table with labal = %s, DC/IC = %d, and - %s", label, counter, type);
     addParamToTable(counter, label, type);
 }
 
-
-void upDataTable() {
-    printf("\nup data label in table");
-}
-
-
-//פונקציה קידוד בינארי סטרינג
+/*String binary encoding function*/
 void asciiToBinaryString(char inputChar, char *outputString) {
     int asciiValue = (int) inputChar;
 
@@ -264,7 +215,7 @@ void asciiToBinaryString(char inputChar, char *outputString) {
     outputString[12] = '\0';
 }
 
-//קידוד בינארי סטרינג
+/*String binary encoding*/
 void binaryString(const char *line, StringTableBIN *table) {
     const char *startQuote = strchr(line, '"');
     char binaryString[13];
@@ -295,7 +246,7 @@ void binaryString(const char *line, StringTableBIN *table) {
 
 }
 
-//קידוד בינארי של מספרים
+/*Binary coding of numbers*/
 void intToBinaryString(int number, char *outputString) {
     for (int i = 0; i < 12; i++) {
         outputString[i] = (number & (1 << (11 - i))) ? '1' : '0';
@@ -304,8 +255,7 @@ void intToBinaryString(int number, char *outputString) {
     outputString[12] = '\0';
 }
 
-//initStringTable(&table);
-//פונקציה קידוד בינארי מספרים
+/*Binary encoding function numbers*/
 void binaryData(const char *line, StringTableBIN *table) {
     const char *delimiters = " ,";
     char *line_copy = strdup(line);
@@ -328,25 +278,6 @@ void binaryData(const char *line, StringTableBIN *table) {
 }
 
 
-/////////////////////
-
-/*
-int isRegister(char *word) {
-    printf("\n+++++  %c +++++\n", word[1]);
-    return (word[1] == '@');
-}
-*/
-/*
-     int i;
-    for (i = 0; i < REGISTER_SIZE; i++) {
-        if (strcmp(word, regs[i]) == 0) {
-            printf("\nis reg");
-            return 0;
-        }
-    }
-    return 1;
-     */
-
 int isNum(char *str) {
     char firstChar = str[0];
     return ((firstChar >= '0' && firstChar <= '9') || firstChar == '-' || firstChar == '+');
@@ -356,7 +287,6 @@ int isLetter(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == ' ');
 }
 
-//////
 
 char *numberToBinaryString(const char *numberStr) {
     int num = atoi(numberStr);
@@ -428,7 +358,6 @@ char *registerToBinaryString(const char *reg) {
     return binaryString;
 }
 
-/////
 
 void convertToBinaryString(int num, char *binaryStr) {
     if (num < 0 || num > 15) {
@@ -610,10 +539,6 @@ void base64_encode(const char* input, char* output) {
     output[output_length] = '\0';
 }
 
-// הפונקציה process_input_file מקבלת שני שמות של קבצים - קובץ קלט וקובץ פלט.
-// הפונקציה פותחת את שני הקבצים, ולאחר מכן עוברת על התוכן של קובץ הקלט שבו כל שורה היא מחרוזת בינארית באורך 12 תווים.
-// לכל מחרוזת בקובץ הקלט מתבצעת המרה לקוד base64 באמצעות הפונקציה base64_encode והתוצאה מודפסת לקובץ הפלט, עם תו נפרד '\n' בין שורות.
-// כאשר כל הקובץ הקלט נסרק, הפונקציה סוגרת את שני קבצי הקלט והפלט ומדפיסה הודעת הצלחה.
 void process_input_file(StringTableBIN *table, const char* output_filename) {
     char input_string[13];
     char output_string[9];
@@ -661,6 +586,7 @@ void process_input_file_ent(const char* output_filename) {
     }
     fclose(output_file);
 }
+
 void process_input_file_ext(const char* output_filename, StringTableBIN *table) {
     int i = 0;
     FILE *output_file = fopen(output_filename, "w");
@@ -739,7 +665,7 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
         L++;
         return;
     }
-    if (isSimbele(tokens[0])==1) {
+    if (isSymbol(tokens[0]) == 1) {
         count--;
 
     }
@@ -909,4 +835,10 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
         default:
             break;
     }
+}
+
+int chekLineEror(char * line_copy){
+    //printf("\nhere chek eror\n");
+    //flagEror++;
+    return 0;
 }

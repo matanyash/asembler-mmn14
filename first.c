@@ -1,15 +1,15 @@
 #include "test.c"
 
 
-int chekLineEror(char * line_copy){
-    //printf("\nhere chek eror\n");
-    //flagEror++;
-    return 0;
-}
+/*
+ * The function goes through the file a second time line by line and performs the binary coding according to the instructions
+ */
+void SecondPass(const char *filename, StringTableBIN *tableBin, ParamTable **tableLabel);
 
-void pastTwo(const char *filename, StringTableBIN *tableBin, ParamTable **tableLabel);
-
-
+/*
+ * The function first goes through the file line by line and performs the binary encoding according to the instructions
+ */
+void processFile(const char *filename);
 
 void processFile(const char *filename) {
     char line[memoryData];
@@ -33,7 +33,7 @@ void processFile(const char *filename) {
         strcpy(line_copy, line);
         //if(chekLineEror(line_copy))continue;
         tokenizeString(line_copy, tokens, &numTokens);
-        if (isSimbele(tokens[0]))flagSimble = 1;
+        if (isSymbol(tokens[0]))flagSimble = 1;
         if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy)){
             if (isStringKeyword(tokens[1]) || isDataKeyword(tokens[1])) {
                 if (flagSimble == 1){
@@ -76,16 +76,15 @@ void processFile(const char *filename) {
     }
     printStringTable(&tableBIN);
     duplicateDataWithType(IC);
-    pastTwo(filename, &tableBIN, &tableLabel);
+    SecondPass(filename, &tableBIN, &tableLabel);
     fclose(file);
     if(flagEror)exit(1);
     process_input_file(&tableBIN,"x.ob");
     process_input_file_ent("ps.ent");
     process_input_file_ext("ps.ext", &tableBIN);
-
 }
 
-void pastTwo(const char *filename, StringTableBIN *tableBin1, ParamTable ** tableLabel1 ) {
+void SecondPass(const char *filename, StringTableBIN *tableBin1, ParamTable ** tableLabel1 ) {
     char line[memoryData];
     char line_copy[memoryData];
     char tokens[MAX_WORDS][MAX_WORD_LENGTH];
@@ -117,7 +116,6 @@ void pastTwo(const char *filename, StringTableBIN *tableBin1, ParamTable ** tabl
     printParamTable(tableLabel1);
     printStringTable(tableBin1);
 }
-
 
 
 int main() {
