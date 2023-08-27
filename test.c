@@ -586,9 +586,6 @@ void binaryActioen(char *line , StringTableBIN *table) {
     strcpy(lineCopy, line);
     tokenizeString(line, tokens, &numTokens);
 
-    for (i = 0; i < numTokens; i++) {
-        printf("%s ", tokens[i]);
-    }
     count = numTokens -1;
     if ((strcmp(tokens[numTokens-1], "rts") == 0)){
         addStringToStringTable(table,"000111000000");
