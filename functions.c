@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "LabelTabel.c"
+#include "TableSymbols.c"
 
 #define memoryData 1024
 #define MAX_STRING_LENGTH 100

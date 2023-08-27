@@ -1,4 +1,4 @@
-#include "test.c"
+#include "functions.c"
 
 
 /*
@@ -116,7 +116,7 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1) {
 
 
 int main() {
-const char *filename = "input.txt";
+const char *filename = "target_file.am";
 processFile(filename);
 
 
