@@ -8,11 +8,9 @@
 #define MAX_STRING_LENGTH 100
 #define MAX_TABLE_SIZE 1024
 #define REGISTER_SIZE 8
-
 #define MAX_WORDS 100
 #define MAX_WORD_LENGTH 50
 
-//משתנים סטטים
 static int flagEror;
 static int flagSimble;
 static int L = 0;
@@ -551,14 +549,10 @@ void process_input_file(StringTableBIN *table, const char* output_filename) {
         printf("eror not can open the file\n");
         return;
     }
-;
 
-    // קריאה שורה אחת לכל פעם מהקובץ הקלט כל עוד יש מחרוזת לקרוא.
     while (i < table->nextIndex) {
         strcpy(input_string,table->strings[i]);
-        // מחיקת התו '\n' שמיותר בסוף המחרוזת (הכריתה של התו האחרון).
-        //[strcspn(input_string, "\n")] = '\0';
-        // המרת המחרוזת בינארית לקוד base64 והדפסתה לקובץ הפלט עם תו נפרד '\n' בסוף כל שורה.
+
         base64_encode(input_string, output_string);
         fprintf(output_file, "%s\n", output_string);
         i++;
@@ -598,9 +592,7 @@ void process_input_file_ext(const char* output_filename, StringTableBIN *table) 
         return;
     }
     while (i < table->nextIndex) {
-        //printf("\n i is - %d\n",i);
         if (strcmp(table->strings[i], "000000000001") == 0) {
-            //printf(" \n^&^& %d  ",tableLabel[i].ID);
             fprintf(output_file, "%s %d\n",table->ent[i],i+100);
         }
         i++;

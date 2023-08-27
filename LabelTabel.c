@@ -4,6 +4,8 @@
 
 #define MAX_TABLE_SIZE 1024
 
+static int countTable = 0;
+
 typedef struct {
     int ID;
     char Label[100];
@@ -20,11 +22,10 @@ void initParamTable() {
 }
 
 int addParamToTable(int ID, const char *Label, const char *Type) {
+    countTable++;
     for (int i = 0; i < MAX_TABLE_SIZE; i++) {
         if (tableLabel[i].nextIndex == -1) {
             tableLabel[i].ID = ID;
-
-            // Copy Label without colon
             int length = strlen(Label);
             if (Label[length - 1] == ':') {
                 strncpy(tableLabel[i].Label, Label, length - 1);
@@ -38,7 +39,7 @@ int addParamToTable(int ID, const char *Label, const char *Type) {
             return i;
         }
     }
-    return -1; // Table is full
+    return -1;
 }
 
 
