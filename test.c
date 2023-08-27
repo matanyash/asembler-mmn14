@@ -7,9 +7,12 @@
 #define memoryData 1024
 #define MAX_STRING_LENGTH 100
 #define MAX_TABLE_SIZE 1024
-//#define REGISTER_SIZE 8
 #define MAX_WORDS 100
 #define MAX_WORD_LENGTH 50
+#define A "00"
+#define R "01"
+#define E "10"
+
 
 static int flagEror;
 static int flagSimble;
@@ -17,10 +20,8 @@ static int L = 0;
 static int DC = 0;
 static int IC = 100;
 
-//const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
 const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
                              "jsr", "rts", "stop"};
-
 const int numWords = sizeof(wordArray) / sizeof(wordArray[0]);
 
 void intToBinaryString10(int num, char *binaryStr);
@@ -33,7 +34,6 @@ typedef struct {
     int nextIndex;
 } StringTableBIN;
 
-//void process_input_file(StringTableBIN *table, const char* output_filename);
 
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
@@ -41,31 +41,25 @@ void initStringTable(StringTableBIN *table) {
 
 int addStringToStringTable(StringTableBIN *table, const char *str) {
     if (table->nextIndex >= MAX_TABLE_SIZE) {
-        return -1; // Table is full
+        return -1;
     }
 
     strncpy(table->strings[table->nextIndex], str, MAX_STRING_LENGTH - 1);
-    table->strings[table->nextIndex][MAX_STRING_LENGTH - 1] = '\0'; // Ensure null-terminated
+    table->strings[table->nextIndex][MAX_STRING_LENGTH - 1] = '\0';
 
     table->nextIndex++;
-    return table->nextIndex - 1; // Index of the added string
+    return table->nextIndex - 1;
 }
 
 void updateTables(StringTableBIN *table1) {
     int size1 = table1->nextIndex;
-    printf("\nsize1 =  %d \n",size1);
     int type;
     char newBin[13];
-    char R[3] = "01";
-    char E[3] = "10";
     int i, j;
 
     for (i = 0; i < size1; i++) {
         for (j = 0; j < 10; j++) {
-            //printf("\n i is = %d , j is %d \n",i,j);
-            //printf("\n table1 is %s \n",table1->strings[i]);
             if (tableLabel[j].nextIndex == -1) continue;
-            //printf("\nlabal = %s    \n", (tableLabel[j].Type));
             if (strcmp(table1->strings[i], tableLabel[j].Label) == 0)
             {
                 if (strcmp(tableLabel[j].Type, "entry") == 0){
@@ -77,12 +71,10 @@ void updateTables(StringTableBIN *table1) {
                     continue;
             }
                 else if (strcmp(tableLabel[j].Type, "extrnal") == 0) {
-                //Update string value with the ID from table2
                     type = tableLabel[j].ID;
                     strcpy(newBin , "000000000001");
                     strcpy(table1->strings[i], newBin);
                     strcpy(table1->ent[i], tableLabel[j].Label);
-                    //printf("\na   %s    \n",table1->strings[i]);
                     continue;
                 }
                 type = tableLabel[j].ID;
@@ -91,13 +83,9 @@ void updateTables(StringTableBIN *table1) {
                 printf(" \n   is entry \n");
                 strcpy( table1->strings[i], newBin);
                 continue;
-            //else strcpy((char *) table1[i].strings, "2222222222");
             }
-            //if (tableLabel[j].nextIndex == -1) break;
         }
-        //printf("\n --  i is %d ----\n",i);
     }
-    printf("\n --   good ----\n");
 }
 void printStringTable(const StringTableBIN *table) {
     for (int i = 0; i < table->nextIndex; i++) {
@@ -110,8 +98,8 @@ int isWordInArray(const char *line) {
     int i;
     char lineCopy[1000];
     char *token;
+    unsigned long long len = strlen(line);
     strcpy(lineCopy, line);
-    int len = strlen(lineCopy);
     if (len > 0 && lineCopy[len - 1] == '\n') {
         lineCopy[len - 1] = '\0';
     }
@@ -119,25 +107,21 @@ int isWordInArray(const char *line) {
     if (lineCopy[len - 1] != ' ') {
         strcat(lineCopy, " ");
     }
-    //printf("--------------%s-----", lineCopy);
     token = strtok(lineCopy, " ");
-    //printf("\n-------------%s-----------",token);
     while (token != NULL) {
         for (i = 0; i < numWords; i++) {
             if (strcmp(token, wordArray[i]) == 0) {
-                printf("\nFound word: %s\n", wordArray[i]);
                 return i;
             }
         }
         token = strtok(NULL, " ");
-        //printf("\n-------------%s-----------",token);
     }
     return -1;
 }
 
 
 int isSymbol(const char *word) {
-    int length = strlen(word);
+    unsigned long long length = strlen(word);
 
     if (length > 0 && word[length - 1] == ':') {
         return 1;
@@ -187,15 +171,14 @@ int containsEntryKeyword(const char *line) {
 
 /*Symbol table update function*/
 void upTabelLabel(char *label, int counter, char *type) {
-//    printf(" this up the table with labal = %s, DC/IC = %d, and - %s", label, counter, type);
     addParamToTable(counter, label, type);
 }
 
 /*String binary encoding function*/
 void asciiToBinaryString(char inputChar, char *outputString) {
     int asciiValue = (int) inputChar;
-
-    for (int i = 0; i < 12; i++) {
+    int i;
+    for (i = 0; i < 12; i++) {
         outputString[i] = (asciiValue & (1 << (11 - i))) ? '1' : '0';
     }
 
@@ -207,35 +190,34 @@ void binaryString(const char *line, StringTableBIN *table) {
     const char *startQuote = strchr(line, '"');
     char binaryString[13];
     char andString[13] = "000000000000";
+    const char *p;
+    const char *endQuote;
     if (startQuote == NULL) {
         printf("No quoted word found.\n");
         return;
     }
 
-    const char *endQuote = strchr(startQuote + 1, '"');
+    endQuote = strchr(startQuote + 1, '"');
     if (endQuote == NULL) {
         printf("Invalid quoted word format.\n");
         return;
     }
 
     printf("Quoted word: ");
-    for (const char *p = startQuote + 1; p < endQuote; p++) {
-        printf("\n%c ", *p);
+    for (p = startQuote + 1; p < endQuote; p++) {
         asciiToBinaryString(*p, binaryString);
-        printf(" binary is - %s", binaryString);
         addStringToStringTable(table, binaryString);
         DC = DC + 1;
     }
-    printf("\nand strtig - %s", andString);
     addStringToStringTable(table, andString);
     DC = DC + 1;
-    printf("\n");
 
 }
 
 /*Binary coding of numbers*/
 void intToBinaryString(int number, char *outputString) {
-    for (int i = 0; i < 12; i++) {
+    int i;
+    for (i = 0; i < 12; i++) {
         outputString[i] = (number & (1 << (11 - i))) ? '1' : '0';
     }
 
@@ -247,14 +229,13 @@ void binaryData(const char *line, StringTableBIN *table) {
     const char *delimiters = " ,";
     char *line_copy = strdup(line);
     char *token = strtok(line_copy, delimiters);
-    char binaryString[13]; // 12 bits + '\0' terminator
+    char binaryString[13];
+    long int num;
 
     while (token != NULL) {
         if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
-            long int num = strtol(token, NULL, 10);
-            printf("\nNumber: %ld", num);
+            num = strtol(token, NULL, 10);
             intToBinaryString(num, binaryString);
-            printf(" binary is - %s", binaryString);
             addStringToStringTable(table, binaryString);
             DC = DC + 1;
         }
@@ -265,7 +246,7 @@ void binaryData(const char *line, StringTableBIN *table) {
 }
 
 
-int isNum(char *str) {
+int isNum(const char *str) {
     char firstChar = str[0];
     return ((firstChar >= '0' && firstChar <= '9') || firstChar == '-' || firstChar == '+');
 }
@@ -277,37 +258,31 @@ int isLetter(char c) {
 
 char *numberToBinaryString(const char *numberStr) {
     int num = atoi(numberStr);
-    char *binaryString = (char *) malloc(11 * sizeof(char)); // 10 bits + null terminator
+    int i;
+    char *binaryString = (char *) malloc(11 * sizeof(char));
     if (binaryString == NULL) {
-        // Handle memory allocation error
         return NULL;
     }
 
     int index = 0;
 
     if (num < 0) {
-        binaryString[index++] = '1'; // Set the sign bit to 1 for negative numbers
-        num = -num; // Convert negative number to positive
-
-        // Calculate the two's complement of the positive value
+        binaryString[index++] = '1';
+        num = -num;
         num = 1024 - num;
     } else {
-        binaryString[index++] = '0'; // Set the sign bit to 0 for positive numbers
+        binaryString[index++] = '0';
     }
 
-    // Convert the number to binary representation
-    for (int i = 8; i >= 0; i--) {
+
+    for (i = 8; i >= 0; i--) {
         binaryString[index++] = ((num >> i) & 1) + '0';
     }
 
-    binaryString[10] = '\0'; // Null-terminate the string
+    binaryString[10] = '\0';
     printf("\n binary is %s", binaryString);
     return binaryString;
 }
-
-//////
-
-/////
 
 char *registerToBinaryString(const char *reg) {
     char *binaryString = NULL;
@@ -361,43 +336,38 @@ void convertToBinaryString(int num, char *binaryStr) {
 
 
 void concatenateWords(const char *word1, const char *word2, const char *word3, const char *word4, char *result) {
-    strcpy(result, word1); // Copy the first word to the result string
+    strcpy(result, word1); 
 
-    strcat(result, word2); // Add the second word
+    strcat(result, word2);
 
-    strcat(result, word3); // Add the third word
+    strcat(result, word3); 
 
-    strcat(result, word4); // Add the third word
+    strcat(result, word4); 
 }
 
 
 void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
-    int actiun = act;
+    int action = act;
     char firstLine[13];
-    char A[3] = "00";
-    char B[3] = "01";
-    char C[3] = "10";
-    char ooraa[5];
-    char yaad[4];
-    char makor[4];
-    printf("\n!!!!! word 1 is %s ", word1);
-    printf("\n!!!!! word 2 is %s ", word2);
+    char directive[5];
+    char target[4];
+    char source[4];
     if (isWordInArray1(word1) == 1) {
-        strcpy(makor, "101");
-        printf("\n is reg!!!");
-    } else if ((isNum(word1) == 1))strcpy(makor, "001");
-    else strcpy(makor, "011");
+        strcpy(source, "101");
+    } else if ((isNum(word1) == 1))strcpy(source, "001");
+    else strcpy(source, "011");
+
     if ((isWordInArray1(word2) == 1)) {
-        printf("\n is reg too!!!");
-        strcpy(yaad, "101");
-    } else if ((isNum(word2) == 1))strcpy(yaad, "001");
-    else strcpy(yaad, "011");
-    if (strcmp(word1, "!") == 0)strcpy(makor, "000");
-    if (strcmp(word2, "!") == 0)strcpy(yaad, "000");
-    convertToBinaryString(actiun, ooraa);
-    concatenateWords(makor, ooraa, yaad, A, firstLine);
+        strcpy(target, "101");
+    } else if ((isNum(word2) == 1))strcpy(target, "001");
+    else strcpy(target, "011");
+
+    if (strcmp(word1, "!") == 0)strcpy(source, "000");
+    if (strcmp(word2, "!") == 0)strcpy(target, "000");
+
+    convertToBinaryString(action, directive);
+    concatenateWords(source, directive, target, A, firstLine);
     addStringToStringTable(table, firstLine);
-    printf("first liine --- %s\n", firstLine);
     L++;
 }
 
@@ -502,12 +472,14 @@ void intToBinaryString10(int num, char *binaryStr) {
 
 void base64_encode(const char* input, char* output) {
     const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    const int input_length = strlen(input);
+    unsigned long long input_length = strlen(input);
+    unsigned int value;
+    int i,j;
     int output_length = 0;
 
-    for (int i = 0; i < input_length; i += 6) {
-        unsigned int value = 0;
-        for (int j = 0; j < 6 && i + j < input_length; j++) {
+    for (i = 0; i < input_length; i += 6) {
+        value = 0;
+        for (j = 0; j < 6 && i + j < input_length; j++) {
             value = (value << 1) | (input[i + j] - '0');
         }
         output[output_length++] = base64_table[value];
@@ -523,7 +495,7 @@ void process_input_file(StringTableBIN *table, const char* output_filename) {
     FILE* output_file = fopen(output_filename, "w");
 
     if (output_file == NULL) {
-        printf("eror not can open the file\n");
+        printf("error not can open the file\n");
         return;
     }
 
@@ -535,10 +507,7 @@ void process_input_file(StringTableBIN *table, const char* output_filename) {
         i++;
     }
 
-    // סגירת קבצי הקלט והפלט.
     fclose(output_file);
-
-    printf("all good\n");
 }
 
 void process_input_file_ent(const char* output_filename) {
@@ -550,9 +519,7 @@ void process_input_file_ent(const char* output_filename) {
         return;
     }
     while (i < MAX_TABLE_SIZE) {
-        //printf("\n i is - %d\n",i);
         if (strcmp(tableLabel[i].Type, "entry") == 0) {
-            //printf(" \n^&^& %d  ",tableLabel[i].ID);
             fprintf(output_file, "%s %d\n",tableLabel[i].Label, tableLabel[i].ID);
         }
         i++;
@@ -605,15 +572,12 @@ void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numT
     }
 }
 
-void binaryOctihen(char *line ,StringTableBIN *table) {
+void binaryActioen(char *line , StringTableBIN *table) {
     char extractedWords[2][50];
     char lineCopy[100];
-    int actiun = isWordInArray(line);
+    int action = isWordInArray(line);
     char twoLine[13];
     char regBinString[13];
-    char A[3] = "00";
-    char B[3] = "01";
-    char C[3] = "10";
     char *numBinaryString;
     char tokens[MAX_WORDS][MAX_WORD_LENGTH];
     int numTokens;
@@ -652,10 +616,10 @@ void binaryOctihen(char *line ,StringTableBIN *table) {
     if ((isWordInArray1(extractedWords[0]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[0]));
     if ((isWordInArray1(extractedWords[1]))==1)strcpy(regBinString, registerToBinaryString10(extractedWords[1]));
 
-    binaryFirstLine(extractedWords[0], extractedWords[1], actiun, table);
+    binaryFirstLine(extractedWords[0], extractedWords[1], action, table);
     numBinaryString = numberToBinaryString(extractedWords[0]);
 
-    switch (actiun) {
+    switch (action) {
         case 0:
             if (isWordInArray1(extractedWords[0]) && isWordInArray1(extractedWords[1])){
                 strcpy(twoLine, registerToBinaryString2(extractedWords[0]));

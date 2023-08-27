@@ -69,7 +69,7 @@ void processFile(const char *filename) {
                 flagEror = 1;
                 continue;
             }
-            binaryOctihen(line_copy,&tableBIN);
+            binaryActioen(line_copy, &tableBIN);
             IC = IC + L;
             continue;
         }
