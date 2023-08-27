@@ -22,18 +22,18 @@ void initParamTable() {
 }
 
 int addParamToTable(int ID, const char *Label, const char *Type) {
+    unsigned long long length = strlen(Label);
+    int i;
     countTable++;
-    for (int i = 0; i < MAX_TABLE_SIZE; i++) {
+    for (i = 0; i < countTable && i< MAX_TABLE_SIZE; i++) {
         if (tableLabel[i].nextIndex == -1) {
             tableLabel[i].ID = ID;
-            int length = strlen(Label);
             if (Label[length - 1] == ':') {
                 strncpy(tableLabel[i].Label, Label, length - 1);
                 tableLabel[i].Label[length - 1] = '\0';
             } else {
                 strncpy(tableLabel[i].Label, Label, sizeof(tableLabel[i].Label));
             }
-
             strncpy(tableLabel[i].Type, Type, sizeof(tableLabel[i].Type));
             tableLabel[i].nextIndex = i + 1;
             return i;
@@ -41,7 +41,6 @@ int addParamToTable(int ID, const char *Label, const char *Type) {
     }
     return -1;
 }
-
 
 void printParamTable() {
     printf("Parameter Table:\n");
@@ -54,7 +53,8 @@ void printParamTable() {
 
 
 void duplicateDataWithType(int number) {
-    for (int i = 0; i < MAX_TABLE_SIZE; i++) {
+    int i;
+    for (i = 0; i < countTable && i < MAX_TABLE_SIZE; i++) {
         if (strcmp(tableLabel[i].Type, "data") == 0) {
             tableLabel[i].ID = tableLabel[i].ID+number;
         }
@@ -62,13 +62,12 @@ void duplicateDataWithType(int number) {
 }
 
 int checkIfWordExists(ParamTable *table,char *word) {
-    //printf("\nword is - %s\n", word);
-    //printf("\ntable is %s\n",table[2].Label);
-    for (int i = 0; i < MAX_TABLE_SIZE; i++) {
+    int i;
+    for (i = 0; i < countTable && i < MAX_TABLE_SIZE; i++) {
         if (strcmp(table[i].Label, word) == 0) {
             strncpy(tableLabel[i].Type, "entry", sizeof(tableLabel[i].Type));
-            return 1; // Word exists in the table
+            return 1;
         }
     }
-    return 0; // Word doesn't exist in the table
+    return 0;
 }
