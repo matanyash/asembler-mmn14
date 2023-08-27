@@ -74,7 +74,6 @@ void processFile(const char *filename) {
             continue;
         }
     }
-    printStringTable(&tableBIN);
     duplicateDataWithType(IC);
     SecondPass(filename, &tableBIN);
     fclose(file);
@@ -113,8 +112,6 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1) {
         IC = IC + L;
     }
     updateTables(tableBin1);
-    printParamTable();
-    printStringTable(tableBin1);
 }
 
 

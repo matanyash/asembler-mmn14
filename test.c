@@ -66,7 +66,6 @@ void updateTables(StringTableBIN *table1) {
                     type = tableLabel[j].ID;
                     intToBinaryString10(type, newBin);
                     strcat(newBin,E);
-                    printf(" \n   is entry \n");
                     strcpy( table1->strings[i], newBin);
                     continue;
             }
@@ -80,7 +79,6 @@ void updateTables(StringTableBIN *table1) {
                 type = tableLabel[j].ID;
                 intToBinaryString10(type, newBin);
                 strcat(newBin,E);
-                printf(" \n   is entry \n");
                 strcpy( table1->strings[i], newBin);
                 continue;
             }
@@ -202,8 +200,6 @@ void binaryString(const char *line, StringTableBIN *table) {
         printf("Invalid quoted word format.\n");
         return;
     }
-
-    printf("Quoted word: ");
     for (p = startQuote + 1; p < endQuote; p++) {
         asciiToBinaryString(*p, binaryString);
         addStringToStringTable(table, binaryString);
@@ -211,7 +207,6 @@ void binaryString(const char *line, StringTableBIN *table) {
     }
     addStringToStringTable(table, andString);
     DC = DC + 1;
-
 }
 
 /*Binary coding of numbers*/
@@ -280,7 +275,6 @@ char *numberToBinaryString(const char *numberStr) {
     }
 
     binaryString[10] = '\0';
-    printf("\n binary is %s", binaryString);
     return binaryString;
 }
 
