@@ -33,12 +33,12 @@ void processFile(const char *filename) {
         strcpy(line_copy, line);
         //if(checkLineError(line_copy))continue;
         tokenizeString(line_copy, tokens, &numTokens);
-        if (isSymbol(tokens[0]))flagSimble = 1;
+        if (isSymbol(tokens[0]))flagSymbol = 1;
         if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy)){
             if (isStringKeyword(tokens[1]) || isDataKeyword(tokens[1])) {
-                if (flagSimble == 1){
+                if (flagSymbol == 1){
                     upTabelLabel(tokens[0], DC, "data");
-                    flagSimble=0;
+                    flagSymbol=0;
                 }
                 if(containsDataKeyword(line_copy)){
 
@@ -55,18 +55,18 @@ void processFile(const char *filename) {
         else if (containsExternKeyword(line_copy) || containsEntryKeyword(line_copy)) {
             if (isExternKeyword(tokens[0])) {
                 upTabelLabel(tokens[1], -1, "extrnal");
-                flagSimble=0;
+                flagSymbol=0;
                 continue;
             }
         }
         else {
-            if (flagSimble) {
+            if (flagSymbol) {
                 upTabelLabel(tokens[0], IC, "code");
-                flagSimble=0;
+                flagSymbol=0;
             }
             if (isWordInArray(line_copy) == -1) { //12
                 printf("\nError! the action not exist");
-                flagEror = 1;
+                flagError = 1;
                 continue;
             }
             binaryActioen(line_copy, &tableBIN);
@@ -77,7 +77,7 @@ void processFile(const char *filename) {
     duplicateDataWithType(IC);
     SecondPass(filename, &tableBIN);
     fclose(file);
-    if(flagEror)exit(1);
+    if(flagError)exit(1);
     process_input_file(&tableBIN,"x.ob");
     process_input_file_ent("ps.ent");
     process_input_file_ext("ps.ext", &tableBIN);
@@ -105,7 +105,7 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1) {
         if (containsEntryKeyword(line_copy)) {
             if (checkIfWordExists(tableLabel, tokens[1]) == 0) {
                 printf("\n Error! the label not entry\n");
-                flagEror = 1;
+                flagError = 1;
                 continue;
             }
         }

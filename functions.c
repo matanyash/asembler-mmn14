@@ -14,8 +14,8 @@
 #define E "10"
 
 
-static int flagEror;
-static int flagSimble;
+static int flagError;
+static int flagSymbol;
 static int L = 0;
 static int DC = 0;
 static int IC = 100;
@@ -157,12 +157,10 @@ int containsDataKeyword(const char *line) {
     return strstr(line, ".data") != NULL;
 }
 
-// בודק אם המחרוזת מכילה את המילה "extern."
 int containsExternKeyword(const char *line) {
     return strstr(line, ".extern") != NULL;
 }
 
-// בודק אם המחרוזת מכילה את המילה ".entry"
 int containsEntryKeyword(const char *line) {
     return strstr(line, ".entry") != NULL;
 }
@@ -280,7 +278,6 @@ char *numberToBinaryString(const char *numberStr) {
 
 char *registerToBinaryString(const char *reg) {
     char *binaryString = NULL;
-    //printf("----------- reg is  %s-----",reg);
     switch (reg[2]) {
         case '0':
             binaryString = "000";
@@ -369,7 +366,7 @@ int isWordInArray1(const char *word) {
     if (word[0] == '@' && word[1] == 'r') {
         if (word[2] >= '0' && word[2] <= '7')return 1;
         else printf("\nthe reg not exits\n");
-        flagEror = 1;
+        flagError = 1;
     }
     return 0;
 }
@@ -764,7 +761,7 @@ void binaryActioen(char *line , StringTableBIN *table) {
 }
 
 int chekLineEror(char * line_copy){
-    //printf("\nhere chek eror\n");
-    //flagEror++;
+    /*printf("\nhere chek eror\n");
+    flagError++;*/
     return 0;
 }
