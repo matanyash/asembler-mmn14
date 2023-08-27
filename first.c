@@ -4,7 +4,7 @@
 /*
  * The function goes through the file a second time line by line and performs the binary coding according to the instructions
  */
-void SecondPass(const char *filename, StringTableBIN *tableBin, ParamTable **tableLabel);
+void SecondPass(const char *filename, StringTableBIN *tableBin);
 
 /*
  * The function first goes through the file line by line and performs the binary encoding according to the instructions
@@ -76,7 +76,7 @@ void processFile(const char *filename) {
     }
     printStringTable(&tableBIN);
     duplicateDataWithType(IC);
-    SecondPass(filename, &tableBIN, &tableLabel);
+    SecondPass(filename, &tableBIN);
     fclose(file);
     if(flagEror)exit(1);
     process_input_file(&tableBIN,"x.ob");
@@ -84,7 +84,7 @@ void processFile(const char *filename) {
     process_input_file_ext("ps.ext", &tableBIN);
 }
 
-void SecondPass(const char *filename, StringTableBIN *tableBin1, ParamTable ** tableLabel1 ) {
+void SecondPass(const char *filename, StringTableBIN *tableBin1) {
     char line[memoryData];
     char line_copy[memoryData];
     char tokens[MAX_WORDS][MAX_WORD_LENGTH];
@@ -104,7 +104,7 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1, ParamTable ** t
         if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy) || containsExternKeyword(line_copy))
             continue;
         if (containsEntryKeyword(line_copy)) {
-            if (checkIfWordExists(tableLabel1, tokens[1]) == 0) {
+            if (checkIfWordExists(tableLabel, tokens[1]) == 0) {
                 printf("\n Eror! the label not entry\n");
                 flagEror = 1;
                 continue;
@@ -113,7 +113,7 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1, ParamTable ** t
         IC = IC + L;
     }
     updateTables(tableBin1);
-    printParamTable(tableLabel1);
+    printParamTable();
     printStringTable(tableBin1);
 }
 

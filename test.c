@@ -22,7 +22,9 @@ static int IC = 100;
 const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
 const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
                              "jsr", "rts", "stop"};
+
 const int numWords = sizeof(wordArray) / sizeof(wordArray[0]);
+
 void intToBinaryString10(int num, char *binaryStr);
 int isWordInArray1(const char *word);
 
