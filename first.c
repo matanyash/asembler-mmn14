@@ -31,7 +31,7 @@ void processFile(const char *filename) {
     while (fgets(line, sizeof(line), file) != NULL) {
         L = 0;
         strcpy(line_copy, line);
-        //if(chekLineEror(line_copy))continue;
+        //if(checkLineError(line_copy))continue;
         tokenizeString(line_copy, tokens, &numTokens);
         if (isSymbol(tokens[0]))flagSimble = 1;
         if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy)){
@@ -65,7 +65,7 @@ void processFile(const char *filename) {
                 flagSimble=0;
             }
             if (isWordInArray(line_copy) == -1) { //12
-                printf("\nEror! the actiun not exist");
+                printf("\nError! the action not exist");
                 flagEror = 1;
                 continue;
             }
@@ -99,13 +99,13 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1) {
     while (fgets(line, sizeof(line), file) != NULL) {
         L = 0;
         strcpy(line_copy, line);
-        //if (chekLineEror(line_copy))continue;
+        //if (checkLineError(line_copy))continue;
         tokenizeString(line_copy, tokens, &numTokens);
         if (containsStringKeyword(line_copy) || containsDataKeyword(line_copy) || containsExternKeyword(line_copy))
             continue;
         if (containsEntryKeyword(line_copy)) {
             if (checkIfWordExists(tableLabel, tokens[1]) == 0) {
-                printf("\n Eror! the label not entry\n");
+                printf("\n Error! the label not entry\n");
                 flagEror = 1;
                 continue;
             }
