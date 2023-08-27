@@ -7,7 +7,7 @@
 #define memoryData 1024
 #define MAX_STRING_LENGTH 100
 #define MAX_TABLE_SIZE 1024
-#define REGISTER_SIZE 8
+//#define REGISTER_SIZE 8
 #define MAX_WORDS 100
 #define MAX_WORD_LENGTH 50
 
@@ -17,7 +17,7 @@ static int L = 0;
 static int DC = 0;
 static int IC = 100;
 
-const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
+//const char *regs[REGISTER_SIZE] = {"@r0", "@r1", "@r2", "@r3", "@r4", "@r5", "@r6", "@r7"};
 const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
                              "jsr", "rts", "stop"};
 
@@ -50,19 +50,6 @@ int addStringToStringTable(StringTableBIN *table, const char *str) {
     table->nextIndex++;
     return table->nextIndex - 1; // Index of the added string
 }
-
-int addEntToStringTable(StringTableBIN *table, const char *str) {
-    if (table->nextIndex >= MAX_TABLE_SIZE) {
-        return -1; // Table is full
-    }
-
-    strncpy(table->ent[table->nextIndex], str, MAX_STRING_LENGTH - 1);
-    table->ent[table->nextIndex][MAX_STRING_LENGTH - 1] = '\0'; // Ensure null-terminated
-
-    table->nextIndex++;
-    return table->nextIndex - 1; // Index of the added string
-}
-
 
 void updateTables(StringTableBIN *table1) {
     int size1 = table1->nextIndex;
@@ -360,15 +347,16 @@ char *registerToBinaryString(const char *reg) {
 
 
 void convertToBinaryString(int num, char *binaryStr) {
+    int i;
     if (num < 0 || num > 15) {
-        binaryStr[0] = '\0';  // אם המספר לא בטווח התקין, מחזירים מחרוזת ריקה
+        binaryStr[0] = '\0';
         return;
     }
 
-    for (int i = 3; i >= 0; i--) {
+    for (i = 3; i >= 0; i--) {
         binaryStr[3 - i] = ((num >> i) & 1) + '0';
     }
-    binaryStr[4] = '\0';  // מוסיף את התו הסיום למחרוזת
+    binaryStr[4] = '\0';
 }
 
 
@@ -422,9 +410,8 @@ int isWordInArray1(const char *word) {
     return 0;
 }
 
-char *registerToBinaryString2(char *reg) {
+char *registerToBinaryString2(const char *reg) {
     char *binaryString;
-    printf("----------- reg is  %s-----", reg);
     switch (reg[2]) {
         case '0':
             binaryString = "00000";
@@ -450,17 +437,13 @@ char *registerToBinaryString2(char *reg) {
         case '7':
             binaryString = "00111";
             break;
-        default:
-            // Handle invalid register
-            break;
 
     }
     return binaryString;
 }
 
-char *registerToBinaryString10(char *reg) {
+char *registerToBinaryString10(const char *reg) {
     char *binaryString;
-    printf("----------- reg is  %s-----", reg);
     switch (reg[2]) {
         case '0':
             binaryString = "000000000000";
@@ -486,16 +469,12 @@ char *registerToBinaryString10(char *reg) {
         case '7':
             binaryString = "000000011100";
             break;
-        default:
-            // Handle invalid register
-            break;
-
     }
-    printf("\n ****** $s \n" , binaryString);
     return binaryString;
 }
 
 void intToBinaryString10(int num, char *binaryStr) {
+    int i;
     if (num < 0) {
         sprintf(binaryStr, "Negative numbers are not supported.");
         return;
@@ -505,21 +484,19 @@ void intToBinaryString10(int num, char *binaryStr) {
         sprintf(binaryStr, "0000000000");
         return;
     }
-
-    int i = 9; // We start from the last character and move to the first
+    i = 9;
     while (num > 0 && i >= 0) {
-        binaryStr[i] = (num % 2) + '0'; // Get the least significant bit
+        binaryStr[i] = (num % 2) + '0';
         num /= 2;
         i--;
     }
 
-    // Fill the remaining characters with leading zeros
     while (i >= 0) {
         binaryStr[i] = '0';
         i--;
     }
 
-    binaryStr[10] = '\0'; // Null-terminate the string
+    binaryStr[10] = '\0';
 }
 
 
