@@ -1,7 +1,7 @@
-my_program:	 test.o function.o binDataString.o global.o function.h define.h typedef.h test.h
+my_program:	 test.o function.o binDataString.o global.o function.h define.h typedef.h transitions.h
 	gcc -g -ansi -Wall -pedantic test.o function.o binDataString.o global.o -o my_program.o
 
-test.o:	 test.c function.h binDataString.h global.h test.h
+test.o:	 transitions.c function.h binDataString.h global.h transitions.h
 	gcc -c -ansi -Wall -pedantic test.c -o test.o
 
 function.o: function.c function.h global.h

@@ -1,8 +1,8 @@
-#include "typedef.h"
 #include "function.h"
 #include "binDataString.h"
 #include "global.h"
-#include "test.h"
+#include "transitions.h"
+#include "PreAssembler.h"
 
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
@@ -117,7 +117,6 @@ void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     char directive[5];
     char target[4];
     char source[4];
-
     if (isRegister(word1) == 1) {
         strcpy(source, "101");
     } else if ((isNum(word1) == 1))strcpy(source, "001");
@@ -147,31 +146,13 @@ void binaryActioen(char *line , StringTableBIN *table) {
     char tokens[MAX_WORDS][MAX_WORD_LENGTH];
     int numTokens;
     int count;
-    int i;
-
     strcpy(lineCopy, line);
     tokenizeString(line, tokens, &numTokens);
+
     count = numTokens -1;
-
-    for (i = 0; i < numTokens; i++){
-        if(strcmp(tokens[i], "rts")==0){
-            if(numTokens > i + 1){
-                printf("Error! after rts can't be any word");
-                flagError = 1;
-            }
-        }
-        if(strcmp(tokens[i], "stop")==0){
-            if(numTokens > i + 1){
-                printf("Error! after stop can't be any word");
-                flagError = 1;
-            }
-        }
-    }
-
     if ((strcmp(tokens[numTokens-1], "rts") == 0)){
         addStringToStringTable(table,"000111000000");
         L++;
-        return;
     }
 
     if(strcmp(tokens[numTokens-1], "stop") == 0){
@@ -477,7 +458,7 @@ void process_input_file_ext(const char* output_filename, StringTableBIN *table) 
     FILE *output_file = fopen(output_filename, "w");
 
     if (output_file == NULL) {
-        printf("error not can open the file\n");
+        printf("eror not can open the file\n");
         return;
     }
     while (i < table->nextIndex) {
@@ -554,11 +535,15 @@ void processFile(const char *filename) {
     }
     duplicateDataWithType(IC);
     SecondPass(filename, &tableBIN);
+
     fclose(file);
+    remove("target_file.am");
+
     if(flagError !=0)exit(1);
     process_input_file(&tableBIN,"ps.ob");
     process_input_file_ent("ps.ent");
     process_input_file_ext("ps.ext", &tableBIN);
+
 }
 
 void SecondPass(const char *filename, StringTableBIN *tableBin1) {
@@ -591,14 +576,4 @@ void SecondPass(const char *filename, StringTableBIN *tableBin1) {
         IC = IC + L;
     }
     updateTables(tableBin1);
-}
-
-int main() {
-    const char *filename = "target_file.am";
-    processFile(filename);
-    /*
-     * remove(filename);
-     * */
-
-    return 0;
 }
