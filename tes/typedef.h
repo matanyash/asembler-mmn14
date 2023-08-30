@@ -16,5 +16,4 @@ typedef struct {
     int nextIndex;
 } ParamTable;
 
-
 #endif

@@ -1,7 +1,6 @@
 #ifndef FUNCTION
 #define FUNCTION
 
-
 /*A function to check if an action exists*/
 int isWordInArray(const char *line);
 
@@ -38,7 +37,10 @@ int isNum(const char *str);
 /*A function that accepts 4 strings and connects them*/
 void concatenateWords(const char *word1, const char *word2, const char *word3, const char *word4, char *result);
 
+/*A function that checks whether it is a correct register and prints an error if not*/
+int isRegister(const char *word);
 
-
+/*A function to divide a line into individual words into an array*/
 void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numTokens);
+
 #endif

@@ -1,60 +1,9 @@
-#include "lib.h"
-#include "function.h"
 #include "typedef.h"
+#include "function.h"
 #include "binDataString.h"
+#include "global.h"
+#include "test.h"
 
-static int countTable = 0;
-static int flagError =0;
-static int flagSymbol;
-static int L = 0;
-static int DC = 0;
-static int IC = 100;
-static ParamTable tableLabel[MAX_TABLE_SIZE];
-
-int isRegister(const char *word);
-
-void initStringTable(StringTableBIN *table);
-
-int addStringToStringTable(StringTableBIN *table, const char *str);
-
-void updateTables(StringTableBIN *table1);
-
-/*Symbol table update function*/
-void upTabelLabel(char *label, int counter, char *type);
-
-/*String binary encoding*/
-void binaryString(const char *line, StringTableBIN *table);
-
-/*Binary encoding function numbers*/
-void binaryData(char *line, StringTableBIN *table);
-
-void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table);
-
-void base64_encode(const char* input, char* output);
-
-void process_input_file(StringTableBIN *table, const char* output_filename);
-
-void process_input_file_ent(const char* output_filename);
-
-void process_input_file_ext(const char* output_filename, StringTableBIN *table);
-
-void binaryActioen(char *line , StringTableBIN *table);
-
-int chekLineEror(char * line_copy);
-
-/******************/
-
-void initParamTable();
-int addParamToTable(int ID, const char *Label, const char *Type);
-void duplicateDataWithType(int number);
-int checkIfWordExists(ParamTable *table,char *word);
-
-/***************/
-void processFile(const char *filename);
-
-void SecondPass(const char *filename, StringTableBIN *tableBin1);
-
-int main();
 
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
@@ -194,18 +143,6 @@ void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     addStringToStringTable(table, firstLine);
     L++;
 }
-
-/*A function that checks whether it is a correct register and prints an error if not*/
-int isRegister(const char *word) {
-    if (word[0] == '@' && word[1] == 'r') {
-        if (word[2] >= '0' && word[2] <= '7')return 1;
-        else printf("\nthe reg not exits\n");
-        flagError = 1;
-    }
-    return 0;
-}
-
-
 
 /*Binary coding of the operations*/
 void binaryActioen(char *line , StringTableBIN *table) {

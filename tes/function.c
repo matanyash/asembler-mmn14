@@ -1,4 +1,5 @@
-#include "lib.h"
+#include "typedef.h"
+#include "global.h"
 #include "function.h"
 
 const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
@@ -88,7 +89,7 @@ void concatenateWords(const char *word1, const char *word2, const char *word3, c
     strcat(result, word4);
 }
 
-/*A function to divide a line into individual words into an array*/
+
 void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numTokens) {
     int i;
     char inputCopy[MAX_WORD_LENGTH];
@@ -115,4 +116,14 @@ void tokenizeString(const char *input, char tokens[][MAX_WORD_LENGTH], int *numT
         tokens[*numTokens][MAX_WORD_LENGTH - 1] = '\0';
         (*numTokens)++;
     }
+}
+
+
+int isRegister(const char *word) {
+    if (word[0] == '@' && word[1] == 'r') {
+        if (word[2] >= '0' && word[2] <= '7')return 1;
+        else printf("\nthe reg not exits\n");
+        flagError = 1;
+    }
+    return 0;
 }
