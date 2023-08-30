@@ -1,9 +1,7 @@
-#include "typedef.h"
 #include "function.h"
 #include "binDataString.h"
 #include "global.h"
 #include "test.h"
-
 
 void initStringTable(StringTableBIN *table) {
     table->nextIndex = 0;
@@ -63,13 +61,10 @@ void printStringTable(const StringTableBIN *table) {
     }
 }
 
-/*Symbol table update function*/
 void upTabelLabel(char *label, int counter, char *type) {
     addParamToTable(counter, label, type);
 }
 
-
-/*String binary encoding*/
 void binaryString(const char *line, StringTableBIN *table) {
     const char *startQuote = strchr(line, '"');
     char binaryString[13];
@@ -95,8 +90,6 @@ void binaryString(const char *line, StringTableBIN *table) {
     DC = DC + 1;
 }
 
-
-/*Binary encoding function numbers*/
 void binaryData(char *line, StringTableBIN *table) {
     const char *delimiters = " ,";
     char *line_copy = strcpy(malloc(strlen(line) + 1), line);
@@ -117,8 +110,6 @@ void binaryData(char *line, StringTableBIN *table) {
     free(line_copy);
 }
 
-
-/*A function that encodes the first line*/
 void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     int action = act;
     char firstLine[13];
@@ -144,7 +135,6 @@ void binaryFirstLine(char *word1, char *word2, int act, StringTableBIN *table) {
     L++;
 }
 
-/*Binary coding of the operations*/
 void binaryActioen(char *line , StringTableBIN *table) {
     char extractedWords[2][50];
     char lineCopy[100];
@@ -347,7 +337,6 @@ int chekLineEror(char * line_copy){
     return 0;
 }
 
-/*initialization of the table*/
 void initParamTable() {
     int i;
     for (i = 0; i < MAX_TABLE_SIZE; i++) {
@@ -355,7 +344,6 @@ void initParamTable() {
     }
 }
 
-/*Updating the symbol table with the numerical value, symbol name and symbol type*/
 int addParamToTable(int ID, const char *Label, const char *Type) {
     unsigned int length = strlen(Label);
     int i;
@@ -407,7 +395,6 @@ int checkIfWordExists(ParamTable *table,char *word) {
     return 0;
 }
 
-/*A function that converts using the base 64 method*/
 void base64_encode(const char* input, char* output) {
     const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     unsigned int input_length = strlen(input);
@@ -426,7 +413,6 @@ void base64_encode(const char* input, char* output) {
     output[output_length] = '\0';
 }
 
-/*A function that creates the final file*/
 void process_input_file(StringTableBIN *table, const char* output_filename) {
     char input_string[13];
     char output_string[9];
@@ -449,7 +435,6 @@ void process_input_file(StringTableBIN *table, const char* output_filename) {
     fclose(output_file);
 }
 
-/*A function that creates the entry file*/
 void process_input_file_ent(const char* output_filename) {
     int i = 0;
     FILE *output_file = fopen(output_filename, "w");
@@ -467,7 +452,6 @@ void process_input_file_ent(const char* output_filename) {
     fclose(output_file);
 }
 
-/*A function that creates the external file*/
 void process_input_file_ext(const char* output_filename, StringTableBIN *table) {
     int i = 0;
     FILE *output_file = fopen(output_filename, "w");
@@ -485,7 +469,6 @@ void process_input_file_ext(const char* output_filename, StringTableBIN *table) 
     fclose(output_file);
 }
 
-/*The function goes line by line on the input and encodes the first line and inserts the symbols into the table*/
 void processFile(const char *filename) {
     char line[memoryData];
     char line_copy[memoryData];
@@ -558,7 +541,6 @@ void processFile(const char *filename) {
     process_input_file_ext("ps.ext", &tableBIN);
 }
 
-/*The function goes line by line on the input and encodes a second line and ends the encoding*/
 void SecondPass(const char *filename, StringTableBIN *tableBin1) {
     char line[memoryData];
     char line_copy[memoryData];

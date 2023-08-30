@@ -1,4 +1,3 @@
-#include "typedef.h"
 #include "global.h"
 #include "function.h"
 

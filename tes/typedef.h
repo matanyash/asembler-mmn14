@@ -8,7 +8,6 @@ typedef struct {
     int nextIndex;
 } StringTableBIN;
 
-
 typedef struct {
     int ID;
     char Label[100];
