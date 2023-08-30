@@ -1,4 +1,4 @@
-/*#include "global.h"*/
+#include "global.h"
 #include "function.h"
 
 const char *wordArray[16] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn",
